@@ -11,9 +11,9 @@ import espeak
 
 class GameController:
     def __init__(self):
-        
+        # Engine to produce sound for any word
         self.es = espeak.ESpeak()
-        
+
         self.view = GameView()
         # When the window is given the "delete_event" signal (this is given
         # by the window manager, usually by the "close" option, or on the
@@ -25,9 +25,8 @@ class GameController:
         # Here we connect the "destroy" event to a signal handler.
         # This event occurs when we call gtk_widget_destroy() on the window,
         # or if we return FALSE in the "delete_event" callback.
-
         self.view.window.connect("destroy", self.destroy)
-        
+
         self.view.window.connect("key-press-event", self.readKey)
 
         # This will cause the window to be destroyed by calling
@@ -48,6 +47,9 @@ class GameController:
         self.level1Words = self.dictionary["words-level1"]
         self.currentIndex = 0
         self.score = 0
+        self.check_current_word = False
+
+        # This field keeps track of what the user has typed so far
         self.typed = ""
         self.view.typeBox.createTextBoxes(len(self.level1Words[0]))
 
@@ -68,31 +70,38 @@ class GameController:
         # with a "delete_event".
         return False
 
-    def checkEntryText(self, widget, field):
-        if self.level1Words[self.currentIndex] == field.get_text().upper():
+    def checkEntryText(self, typed):
+        if self.level1Words[self.currentIndex] == typed.upper():
             self.view.resultLabel.set_text("CORRECT!")
             self.view.nextButton.set_label("NEXT")
             self.updateScore(10)
+            self.check_current_word = True
         else:
             self.view.resultLabel.set_text("INCORRECT!")
-            #os.system("espeak 'INCORRECT'")
+
 
     def playWord(self, widget, data=None):
         currentWord = self.level1Words[self.currentIndex]
         os.system("espeak '{}'".format(currentWord))
 
     def nextWord(self, widget, data=None):
+        self.typed = ""
         self.currentIndex += 1
+        print self.currentIndex
+        self.check_current_word = False
+
         if self.currentIndex == len(self.level1Words):
-            finalText = "LEVEL COMPLETED. You score " + str(self.score) + " out of 40."
+            finalText = "LEVEL COMPLETED. You score " + str(self.score) + " out of " + str(len(self.level1Words) * 10)
             os.system("espeak '{}'".format(finalText))
+            # TO-DO: Render the view for the next level
+
         else:
+            self.playWord(self.view)
             self.view.typeBox.createTextBoxes(len(self.level1Words[self.currentIndex]))
             self.view.resultLabel.set_text("")
-            self.view.wordField.set_text("")
             self.view.nextButton.set_label("SKIP")
 
-
+    # This function takes in a file name and load all the words from the corresponding file
     def load_words(self, filename):
         file = open(filename)
         word = file.readline()
@@ -101,22 +110,30 @@ class GameController:
             wordlist.append(word[:len(word)-1])
             word = file.readline()
 
+        # a global dictionary that keeps track of all the words used by levels
         self.dictionary[filename] = wordlist
 
     def updateScore(self, increment):
         self.score += increment
         self.view.scoreLabel.set_text("SCORE: " + str(self.score))
-    
+
     def destroy(self, widget, data=None):
         print "destroy signal occurred"
         gtk.main_quit()
 
+    # Process the key pressed by the player
     def readKey(self, widget, event):
         keyval = event.keyval
         keyval_name = gtk.gdk.keyval_name(keyval)
+
+        # Backspace function
         if keyval_name == 'BackSpace':
             self.typed = self.typed[:len(self.typed)-1]
             self.view.typeBox.addWord(self.typed)
+
+        elif keyval_name == 'Return' and self.check_current_word == False:
+            self.checkEntryText(self.typed)
+
         elif keyval_name.isalpha() and len(keyval_name) == 1 and len(self.typed) < len(self.level1Words[self.currentIndex]):
             self.typed = self.typed + keyval_name
             self.view.typeBox.addWord(self.typed)

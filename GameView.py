@@ -15,7 +15,11 @@ class GameView:
 
         # Creates a new button with the label "Hello World".
         self.button = gtk.Button("Play Word")
+        self.button.set_can_focus(False)
+
         self.nextButton = gtk.Button("SKIP")
+        self.nextButton.set_can_focus(False)
+        
         self.typeBox = TypeBox()
         self.label = gtk.Label("LEVEL 1")
         self.scoreLabel = gtk.Label("SCORE: 0")

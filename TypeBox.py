@@ -29,6 +29,10 @@ class TypeBox(gtk.HBox):
         requiredCount = self.resetContent()
         for index in range(requiredCount):
             self.textFields.append(gtk.Entry(max=1))
+
+        # disable the highlighting of the boxes
+        for box in self.textFields:
+            box.set_can_focus(False)
         self.showBoxes()
 
 
@@ -36,15 +40,17 @@ class TypeBox(gtk.HBox):
     # If there are more than required textfields previously
     # created, this method removes them.
     def resetContent(self):
-        if(len(self.textFields) == 0):
+        if (len(self.textFields) == 0):
             return self.numBoxes
-        elif(len(self.textFields) > self.numBoxes):
+
+        # If we have more text boxes than we need
+        elif (len(self.textFields) > self.numBoxes):
             removeCount = len(self.textFields) - self.numBoxes
             for index in range(removeCount):
                 self.hbox.remove(self.textFields.pop())
-        else:
-            self.resetTextBox()
-            return self.numBoxes - len(self.textFields)
+
+        self.resetTextBox()
+        return self.numBoxes - len(self.textFields)
 
 
     # This method shows all the existing textfields.
@@ -61,6 +67,7 @@ class TypeBox(gtk.HBox):
         for index in range(len(word)):
             self.textFields[index].set_text(word[index])
 
+    # Reset the text of all textbox to ""
     def resetTextBox(self):
         for textField in self.textFields:
             textField.set_text("")

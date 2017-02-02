@@ -7,9 +7,13 @@ pygtk.require('2.0')
 import gtk
 import os
 from GameView import GameView
+import espeak
 
 class GameController:
     def __init__(self):
+        
+        self.es = espeak.ESpeak()
+        
         self.view = GameView()
         # When the window is given the "delete_event" signal (this is given
         # by the window manager, usually by the "close" option, or on the
@@ -23,6 +27,8 @@ class GameController:
         # or if we return FALSE in the "delete_event" callback.
 
         self.view.window.connect("destroy", self.destroy)
+        
+        self.view.window.connect("key-press-event", self.readKey)
 
         # This will cause the window to be destroyed by calling
         # gtk_widget_destroy(window) when "clicked".  Again, the destroy
@@ -30,7 +36,7 @@ class GameController:
 
         self.view.button.connect_object("clicked", self.playWord, "Play Word")
         self.view.nextButton.connect_object("clicked", self.nextWord, "Next Word")
-        self.view.wordField.connect("activate", self.checkEntryText, self.view.wordField)
+        #self.view.wordField.connect("activate", self.checkEntryText, self.view.wordField)
         self.view.vbox.connect('expose-event', self.addImage)
 
         self.dictionary = {}
@@ -42,6 +48,7 @@ class GameController:
         self.level1Words = self.dictionary["words-level1"]
         self.currentIndex = 0
         self.score = 0
+        self.typed = ""
         self.view.typeBox.createTextBoxes(len(self.level1Words[0]))
 
     def addImage(self, widget, event):
@@ -65,11 +72,10 @@ class GameController:
         if self.level1Words[self.currentIndex] == field.get_text().upper():
             self.view.resultLabel.set_text("CORRECT!")
             self.view.nextButton.set_label("NEXT")
-            self.score += 10;
-            os.system("espeak 'CORRECT'")
+            self.updateScore(10)
         else:
             self.view.resultLabel.set_text("INCORRECT!")
-            os.system("espeak 'INCORRECT'")
+            #os.system("espeak 'INCORRECT'")
 
     def playWord(self, widget, data=None):
         currentWord = self.level1Words[self.currentIndex]
@@ -92,14 +98,28 @@ class GameController:
         word = file.readline()
         wordlist = []
         while len(word) > 0:
-            wordlist.append(word)
+            wordlist.append(word[:len(word)-1])
             word = file.readline()
 
         self.dictionary[filename] = wordlist
 
+    def updateScore(self, increment):
+        self.score += increment
+        self.view.scoreLabel.set_text("SCORE: " + str(self.score))
+    
     def destroy(self, widget, data=None):
         print "destroy signal occurred"
         gtk.main_quit()
+
+    def readKey(self, widget, event):
+        keyval = event.keyval
+        keyval_name = gtk.gdk.keyval_name(keyval)
+        if keyval_name == 'BackSpace':
+            self.typed = self.typed[:len(self.typed)-1]
+            self.view.typeBox.addWord(self.typed)
+        elif keyval_name.isalpha() and len(keyval_name) == 1 and len(self.typed) < len(self.level1Words[self.currentIndex]):
+            self.typed = self.typed + keyval_name
+            self.view.typeBox.addWord(self.typed)
 
 
 def main():

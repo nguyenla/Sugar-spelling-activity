@@ -6,6 +6,7 @@
 import pygtk
 pygtk.require('2.0')
 import gtk
+import re
 
 class TypeBox(gtk.HBox):
     def __init__(self):
@@ -42,8 +43,7 @@ class TypeBox(gtk.HBox):
             for index in range(removeCount):
                 self.hbox.remove(self.textFields.pop())
         else:
-            for textField in self.textFields:
-                textField.set_text("")
+            self.resetTextBox()
             return self.numBoxes - len(self.textFields)
 
 
@@ -52,8 +52,19 @@ class TypeBox(gtk.HBox):
         for textField in self.textFields:
             textField.set_size_request(50,30)
             self.hbox.pack_start(textField, True, False, 0)
+            textField.set_property("editable", False)
+            textField.set_alignment(xalign = 0.5)
             textField.show()
-    
+
+    def addWord(self, word):
+        self.resetTextBox()
+        for index in range(len(word)):
+            self.textFields[index].set_text(word[index])
+
+    def resetTextBox(self):
+        for textField in self.textFields:
+            textField.set_text("")
+
     def main(self):
         # All PyGTK applications must have a gtk.main(). Control ends here
         # and waits for an event to occur (like a key press or mouse event).

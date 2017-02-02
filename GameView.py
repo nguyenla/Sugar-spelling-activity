@@ -16,9 +16,9 @@ class GameView:
         # Creates a new button with the label "Hello World".
         self.button = gtk.Button("Play Word")
         self.nextButton = gtk.Button("SKIP")
-        self.wordField = gtk.Entry(max=10)
         self.typeBox = TypeBox()
         self.label = gtk.Label("LEVEL 1")
+        self.scoreLabel = gtk.Label("SCORE: 0")
         self.resultLabel = gtk.Label("")
 
         self.button.set_size_request(20,30)
@@ -27,8 +27,8 @@ class GameView:
         self.window.add(self.vbox)
         self.vbox.show()
 
+        self.vbox.pack_start(self.scoreLabel, True, True, 0)
         self.vbox.pack_start(self.label, True, True, 0)
-        self.vbox.pack_start(self.wordField, True, True, 0)
         self.vbox.pack_start(self.typeBox.hbox, True, True, 0)
         self.vbox.pack_start(self.resultLabel, True, True, 0)
 
@@ -44,9 +44,9 @@ class GameView:
         # The final step is to display this newly created widget.
         self.button.show()
         self.nextButton.show()
-        self.wordField.show()
         self.typeBox.show()
         self.label.show()
+        self.scoreLabel.show()
         self.resultLabel.show()
 
         # and the window

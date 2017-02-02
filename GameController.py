@@ -42,6 +42,7 @@ class GameController:
         self.level1Words = self.dictionary["words-level1"]
         self.currentIndex = 0
         self.score = 0
+        self.view.typeBox.createTextBoxes(len(self.level1Words[0]))
 
     def addImage(self, widget, event):
         path = 'background.jpg'
@@ -80,6 +81,7 @@ class GameController:
             finalText = "LEVEL COMPLETED. You score " + str(self.score) + " out of 40."
             os.system("espeak '{}'".format(finalText))
         else:
+            self.view.typeBox.createTextBoxes(len(self.level1Words[self.currentIndex]))
             self.view.resultLabel.set_text("")
             self.view.wordField.set_text("")
             self.view.nextButton.set_label("SKIP")

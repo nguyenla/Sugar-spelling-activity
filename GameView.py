@@ -1,6 +1,7 @@
 import pygtk
 pygtk.require('2.0')
 import gtk
+from TypeBox import TypeBox
 
 class GameView:
     def __init__(self):
@@ -16,6 +17,7 @@ class GameView:
         self.button = gtk.Button("Play Word")
         self.nextButton = gtk.Button("SKIP")
         self.wordField = gtk.Entry(max=10)
+        self.typeBox = TypeBox()
         self.label = gtk.Label("LEVEL 1")
         self.resultLabel = gtk.Label("")
 
@@ -27,6 +29,7 @@ class GameView:
 
         self.vbox.pack_start(self.label, True, True, 0)
         self.vbox.pack_start(self.wordField, True, True, 0)
+        self.vbox.pack_start(self.typeBox.hbox, True, True, 0)
         self.vbox.pack_start(self.resultLabel, True, True, 0)
 
         self.hbox = gtk.HBox(False, 0)
@@ -42,6 +45,7 @@ class GameView:
         self.button.show()
         self.nextButton.show()
         self.wordField.show()
+        self.typeBox.show()
         self.label.show()
         self.resultLabel.show()
 

@@ -7,6 +7,8 @@ pygtk.require('2.0')
 import gtk
 import os
 from GameView import GameView
+from RootView import RootView
+from HomeView import HomeView
 from Speak import Speak
 import espeak
 
@@ -15,44 +17,34 @@ class GameController:
         # Engine to produce sound for any word
         self.es = espeak.ESpeak()
 
-        self.view = GameView()
-        # When the window is given the "delete_event" signal (this is given
-        # by the window manager, usually by the "close" option, or on the
-        # titlebar), we ask it to call the delete_event () function
-        # as defined above. The data passed to the callback
-        # function is NULL and is ignored in the callback function.
+        # Root view to be used everytime a new view is created
+        self.root_view = RootView()
+
+        # Create a game view
+        # self.view = HomeView(self.root_view.window)
+        self.view = GameView(self.root_view.window)
+
+        # Set up connections for the windows and the buttons
         self.view.window.connect("delete_event", self.delete_event)
-
-        # Here we connect the "destroy" event to a signal handler.
-        # This event occurs when we call gtk_widget_destroy() on the window,
-        # or if we return FALSE in the "delete_event" callback.
         self.view.window.connect("destroy", self.destroy)
-
         self.view.window.connect("key-press-event", self.readKey)
-
-        # This will cause the window to be destroyed by calling
-        # gtk_widget_destroy(window) when "clicked".  Again, the destroy
-        # signal could come from here, or the window manager.
-
         self.view.button.connect_object("clicked", self.playWord, "Play Word")
         self.view.nextButton.connect_object("clicked", self.nextWord, "Next Word")
-        #self.view.wordField.connect("activate", self.checkEntryText, self.view.wordField)
         self.view.vbox.connect('expose-event', self.addImage)
 
-        self.dictionary = {}
-        self.load_words("words-level1")
-        # for word in self.dictionary["words-level1"]:
-        #     print word
-
-        # define words for the level
-        self.level1Words = self.dictionary["words-level1"]
-        self.currentIndex = 0
+        # Fields of the controller
+        self.dictionary = {} # Keep all the words used in the game
+        self.level_words = []
+        self.level = 1
+        self.currentIndex = 0 # index of the current word that is pronounced
         self.score = 0
-        self.check_current_word = False
+        self.check_current_word = False # keep track of whether the current word has been typed correctly
+        self.typed = "" # This field keeps track of what the user has typed so far
 
-        # This field keeps track of what the user has typed so far
-        self.typed = ""
-        self.view.typeBox.createTextBoxes(len(self.level1Words[0]))
+        # Set the game up for the first level
+        self.next_level()
+        self.view.typeBox.createTextBoxes(len(self.level_words[0]))
+
 
     def addImage(self, widget, event):
         path = 'background.jpg'
@@ -72,7 +64,7 @@ class GameController:
         return False
 
     def checkEntryText(self, typed):
-        if self.level1Words[self.currentIndex] == typed.upper():
+        if self.level_words[self.currentIndex] == typed.upper():
             self.view.resultLabel.set_text("CORRECT!")
             self.view.nextButton.set_label("NEXT")
             self.updateScore(10)
@@ -82,7 +74,7 @@ class GameController:
 
 
     def playWord(self, widget, data=None):
-        currentWord = self.level1Words[self.currentIndex]
+        currentWord = self.level_words[self.currentIndex]
         speak = Speak(currentWord)
         speak.start()
         speak.stop()
@@ -93,14 +85,16 @@ class GameController:
         print self.currentIndex
         self.check_current_word = False
 
-        if self.currentIndex == len(self.level1Words):
-            finalText = "LEVEL COMPLETED. You score " + str(self.score) + " out of " + str(len(self.level1Words) * 10)
+        if self.currentIndex == len(self.level_words):
+            finalText = "LEVEL COMPLETED. You score " + str(self.score) + " out of " + str(len(self.level_words) * 10)
             os.system("espeak '{}'".format(finalText))
+            self.level += 1
+            self.next_level()
             # TO-DO: Render the view for the next level
 
         else:
             self.playWord(self.view)
-            self.view.typeBox.createTextBoxes(len(self.level1Words[self.currentIndex]))
+            self.view.typeBox.createTextBoxes(len(self.level_words[self.currentIndex]))
             self.view.resultLabel.set_text("")
             self.view.nextButton.set_label("SKIP")
 
@@ -134,13 +128,29 @@ class GameController:
             self.typed = self.typed[:len(self.typed)-1]
             self.view.typeBox.addWord(self.typed)
 
-        elif keyval_name == 'Return' and self.check_current_word == False:
-            self.checkEntryText(self.typed)
+        elif keyval_name == 'Return':
+            if self.check_current_word == False:
+                self.checkEntryText(self.typed)
+            else:
+                self.nextWord(self.view.nextButton)
 
-        elif keyval_name.isalpha() and len(keyval_name) == 1 and len(self.typed) < len(self.level1Words[self.currentIndex]):
+        elif keyval_name.isalpha() and len(keyval_name) == 1 and len(self.typed) < len(self.level_words[self.currentIndex]):
             self.typed = self.typed + keyval_name
             self.view.typeBox.addWord(self.typed)
 
+    # Get the words for the next level and reset the view
+    def next_level(self):
+        self.load_words("words-level" + str(self.level))
+
+        # define words for the level
+        self.level_words = self.dictionary["words-level" + str(self.level)]
+        self.currentIndex = 0
+        self.check_current_word = False
+
+        # This field keeps track of what the user has typed so far
+        self.typed = ""
+        self.view.typeBox.createTextBoxes(len(self.level_words[0]))
+        self.view.label.set_text("LEVEL " + str(self.level))
 
 def main():
     game = GameController()

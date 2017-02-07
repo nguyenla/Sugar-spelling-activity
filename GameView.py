@@ -1,25 +1,19 @@
 import pygtk
 pygtk.require('2.0')
 import gtk
+from RootView import RootView
 from TypeBox import TypeBox
 
 class GameView:
-    def __init__(self):
-
-        # create a new window
-        self.window = gtk.Window(gtk.WINDOW_TOPLEVEL)
-        self.window.resize(400,400)
-
-        # Sets the border width of the window.
-        self.window.set_border_width(20)
-
+    def __init__(self, window):
+        self.window = window
         # Creates a new button with the label "Hello World".
         self.button = gtk.Button("Play Word")
         self.button.set_can_focus(False)
 
         self.nextButton = gtk.Button("SKIP")
         self.nextButton.set_can_focus(False)
-        
+
         self.typeBox = TypeBox()
         self.label = gtk.Label("LEVEL 1")
         self.scoreLabel = gtk.Label("SCORE: 0")
@@ -53,7 +47,6 @@ class GameView:
         self.scoreLabel.show()
         self.resultLabel.show()
 
-        # and the window
         self.window.show()
 
     def main(self):

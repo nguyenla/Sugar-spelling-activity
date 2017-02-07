@@ -7,6 +7,7 @@ pygtk.require('2.0')
 import gtk
 import os
 from GameView import GameView
+from Speak import Speak
 import espeak
 
 class GameController:
@@ -82,7 +83,9 @@ class GameController:
 
     def playWord(self, widget, data=None):
         currentWord = self.level1Words[self.currentIndex]
-        os.system("espeak '{}'".format(currentWord))
+        speak = Speak(currentWord)
+        speak.start()
+        speak.stop()
 
     def nextWord(self, widget, data=None):
         self.typed = ""

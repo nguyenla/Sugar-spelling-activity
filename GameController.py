@@ -1,7 +1,5 @@
 #!/usr/bin/env python
 
-# example helloworld.py
-
 import pygtk
 pygtk.require('2.0')
 import gtk
@@ -15,13 +13,19 @@ import espeak
 class GameController:
     def __init__(self):
         # Engine to produce sound for any word
-        self.es = espeak.ESpeak()
+        # self.es = espeak.ESpeak()
 
         # Root view to be used everytime a new view is created
         self.root_view = RootView()
 
         # Create a game view
-        # self.view = HomeView(self.root_view.window)
+        self.view = HomeView(self.root_view.window)
+        self.view.button.connect_object("clicked", self.render_game1, "")
+        self.view.button.connect_object("clicked", self.render_game2, "")
+
+    # Render the first game
+    def render_game1(self, button):
+        self.root_view.window.remove(self.view.vbox)
         self.view = GameView(self.root_view.window)
 
         # Set up connections for the windows and the buttons
@@ -45,6 +49,17 @@ class GameController:
         self.next_level()
         self.view.typeBox.createTextBoxes(len(self.level_words[0]))
 
+    def render_game2(self, button):
+        self.root_view.window.remove(self.view.vbox)
+        self.view = GameView(self.root_view.window)
+
+        # Set up connections for the windows and the buttons
+        self.view.window.connect("delete_event", self.delete_event)
+        self.view.window.connect("destroy", self.destroy)
+        self.view.window.connect("key-press-event", self.readKey)
+        self.view.button.connect_object("clicked", self.playWord, "Hi")
+        self.view.nextButton.connect_object("clicked", self.nextWord, "Lam")
+        self.view.vbox.connect('expose-event', self.addImage)
 
     def addImage(self, widget, event):
         path = 'background.jpg'

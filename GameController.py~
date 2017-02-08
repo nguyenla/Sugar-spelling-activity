@@ -9,7 +9,6 @@ from RootView import RootView
 import sys
 sys.path.append("python-espeak/")
 from HomeView import HomeView
-from Speak import Speak
 import espeak
 
 class GameController:

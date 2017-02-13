@@ -14,6 +14,9 @@ class HomeView:
         self.nextButton = gtk.Button("Game 2")
         self.nextButton.set_can_focus(False)
 
+        self.button3 = gtk.Button("Game 3")
+        self.button3.set_can_focus(False)
+
         self.vbox = gtk.VBox(False, 0)
         self.window.add(self.vbox)
         self.vbox.show()
@@ -21,9 +24,11 @@ class HomeView:
         self.hbox = gtk.HBox(False, 0)
         self.hbox.pack_start(self.button, True, True, 0)
         self.hbox.pack_start(self.nextButton, True, True, 0)
+        self.hbox.pack_start(self.button3, True, True, 0)
         self.vbox.add(self.hbox)
         self.hbox.show()
 
         # The final step is to display this newly created widget.
         self.button.show()
         self.nextButton.show()
+        self.button3.show()

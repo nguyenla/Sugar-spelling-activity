@@ -34,12 +34,15 @@ class Game2Controller:
 
     def make_round(self):
 	roundList = []
+	picked = []
 	#generate a word list for this round and randomly assign them
 	#figure out how to not get a duplicate word from correct list (possibly not_in method)
-	print len(self.correctWords)
+	
 	for i in range(3):
 	    x = randint(0,len(self.correctWords)-1)
-	    roundList.append(self.correctWords[x])
+	    if x not in picked:
+	        roundList.append(self.correctWords[x])
+	    picked.append(x)
 	roundList.append(self.incorrectWords[randint(0,len(self.incorrectWords)-1)])
 
 	self.view.word1.set_label(roundList[0])

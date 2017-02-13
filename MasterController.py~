@@ -23,6 +23,7 @@ class MasterController:
         self.view = HomeView(self.root_view.window)
         self.view.button.connect_object("clicked", self.render_game1, "")
         self.view.button2.connect_object("clicked", self.render_game2, "")
+        self.view.button3.connect_object("clicked", self.render_game3, "")
 
         self.view.window.connect("delete_event", self.delete_event)
         self.view.window.connect("destroy", self.destroy)
@@ -36,9 +37,19 @@ class MasterController:
 
     # Render the second game
     def render_game2(self, button):
+<<<<<<< HEAD
         self.root_view.window.remove(self.view.vbox)
         self.view = Game2View(self.root_view.window)
         self.controller = Game2Controller(self.view)
+
+=======
+        print "render game2"
+
+    def render_game3(self,button):
+        self.root_view.window.remove(self.view.vbox)
+        self.view = GameView3(self.root_view.window)
+        self.controller = GameController3(self.view)
+>>>>>>> 046b9c0a328d9b29f090005900f69f02f998acb6
 
     def addImage(self, widget, event):
         path = 'background.jpg'

@@ -40,7 +40,6 @@ class MasterController:
         self.view = Game2View(self.root_view.window)
         self.controller = Game2Controller(self.view)
 
-
     def addImage(self, widget, event):
         path = 'background.jpg'
         pixbuf = gtk.gdk.pixbuf_new_from_file(path)

@@ -20,7 +20,7 @@ class HomeView:
 
         self.hbox = gtk.HBox(False, 0)
         self.hbox.pack_start(self.button, True, True, 0)
-        self.hbox.pack_start(self.button2, True, True, 0)
+        self.hbox.pack_start(self.nextButton, True, True, 0)
         self.vbox.add(self.hbox)
         self.hbox.show()
 

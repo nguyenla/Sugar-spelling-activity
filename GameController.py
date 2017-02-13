@@ -13,26 +13,10 @@ from Speak import Speak
 import espeak
 
 class GameController:
-    def __init__(self):
+    def __init__(self, view):
         # Engine to produce sound for any word
         # self.es = espeak.ESpeak()
-
-        # Root view to be used everytime a new view is created
-        self.root_view = RootView()
-
-        # Create a game view
-        self.view = HomeView(self.root_view.window)
-        self.view.button.connect_object("clicked", self.render_game1, "")
-        self.view.button.connect_object("clicked", self.render_game2, "")
-
-    # Render the first game
-    def render_game1(self, button):
-        self.root_view.window.remove(self.view.vbox)
-        self.view = GameView(self.root_view.window)
-
-        # Set up connections for the windows and the buttons
-        self.view.window.connect("delete_event", self.delete_event)
-        self.view.window.connect("destroy", self.destroy)
+        self.view = view
         self.view.window.connect("key-press-event", self.readKey)
         self.view.button.connect_object("clicked", self.playWord, "Play Word")
         self.view.nextButton.connect_object("clicked", self.nextWord, "Next Word")
@@ -46,22 +30,12 @@ class GameController:
         self.score = 0
         self.check_current_word = False # keep track of whether the current word has been typed correctly
         self.typed = "" # This field keeps track of what the user has typed so far
+        self.skipped = [] # List of words that are skipped
 
         # Set the game up for the first level
         self.next_level()
         self.view.typeBox.createTextBoxes(len(self.level_words[0]))
 
-    def render_game2(self, button):
-        self.root_view.window.remove(self.view.vbox)
-        self.view = GameView(self.root_view.window)
-
-        # Set up connections for the windows and the buttons
-        self.view.window.connect("delete_event", self.delete_event)
-        self.view.window.connect("destroy", self.destroy)
-        self.view.window.connect("key-press-event", self.readKey)
-        self.view.button.connect_object("clicked", self.playWord, "Hi")
-        self.view.nextButton.connect_object("clicked", self.nextWord, "Lam")
-        self.view.vbox.connect('expose-event', self.addImage)
 
     def addImage(self, widget, event):
         path = 'background.jpg'
@@ -130,6 +104,11 @@ class GameController:
     def updateScore(self, increment):
         self.score += increment
         self.view.scoreLabel.set_text("SCORE: " + str(self.score))
+
+    def addImage(self, widget, event):
+        path = 'background.jpg'
+        pixbuf = gtk.gdk.pixbuf_new_from_file(path)
+        widget.window.draw_pixbuf(widget.style.bg_gc[gtk.STATE_NORMAL], pixbuf, 0, 0, 0,0)
 
     def destroy(self, widget, data=None):
         print "destroy signal occurred"

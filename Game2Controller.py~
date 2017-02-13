@@ -14,7 +14,7 @@ class Game2Controller:
     def __init__(self, view):
         self.view = view
 
-#        self.view.skip.connect_object("clicked", self.skip, "SKIP")
+        self.view.skip.connect_object("clicked", self.skip_press, "SKIP")
         self.view.vbox.connect('expose-event', self.addImage)
 
         # Fields of the controller
@@ -25,6 +25,7 @@ class Game2Controller:
         self.correctWords = [] 
 
         # Set the game up for the first level
+	self.view.skipLabel.set_text("Skips left:" + str(skipsLeft))
 	self.get_correct("Game2-CorrectlySpelled")
         self.generate_level()
 
@@ -32,12 +33,13 @@ class Game2Controller:
 	self.load_level_incorrect(self.level)
 	self.make_round()
 
+
+    #INDEXERROR seems to occur sometimes where an incorrect word is saved into the word3
+    # no clue why yet
     def make_round(self):
 	roundList = []
 	picked = []
-	#generate a word list for this round and randomly assign them
-	#figure out how to not get a duplicate word from correct list (possibly not_in method)
-	
+	#generate a word list for this round and randomly assign them	
 	for i in range(3):
 	    x = randint(0,len(self.correctWords)-1)
 	    if x not in picked:
@@ -45,10 +47,21 @@ class Game2Controller:
 	    picked.append(x)
 	roundList.append(self.incorrectWords[randint(0,len(self.incorrectWords)-1)])
 
+	#still need to randomize where the words appear
 	self.view.word1.set_label(roundList[0])
 	self.view.word2.set_label(roundList[1])
 	self.view.word3.set_label(roundList[2])
 	self.view.word4.set_label(roundList[3])
+
+
+    def skip_press(self, widget):
+	if self.skipsLeft > 0:
+            self.make_round()
+	    self.skipsLeft = self.skipsLeft - 1
+	    self.view.skipLabel.set_text("Skips left:" + str(skipsLeft))
+	else:
+	    self.view.resultLabel.set_text("No Skips Left!")
+
 
 
     # This function takes in a file name and load all the words from the corresponding file

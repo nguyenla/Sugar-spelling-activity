@@ -65,6 +65,7 @@ class Game2View:
         self.label.show()
         self.scoreLabel.show()
         self.resultLabel.show()
+	self.skipLabel.show()
 
         self.window.show()
 

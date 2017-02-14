@@ -10,5 +10,5 @@ class RootView:
         self.window.resize(400,400)
 
         # Sets the border width of the window.
-        self.window.set_border_width(20)
+        self.window.set_border_width(0)
         self.window.show()

@@ -6,9 +6,11 @@ import gtk
 import os
 from GameView import GameView
 from Game2View import Game2View
+from Game3View import Game3View
 from RootView import RootView
 from GameController import GameController
 from Game2Controller import Game2Controller
+from Game3Controller import Game3Controller
 import sys
 sys.path.append("python-espeak/")
 from HomeView import HomeView
@@ -43,8 +45,8 @@ class MasterController:
 
     def render_game3(self,button):
         self.root_view.window.remove(self.view.vbox)
-        self.view = GameView3(self.root_view.window)
-        self.controller = GameController3(self.view)
+        self.view = Game3View(self.root_view.window)
+        self.controller = Game3Controller(self.view)
 
     def addImage(self, widget, event):
         path = 'background.jpg'

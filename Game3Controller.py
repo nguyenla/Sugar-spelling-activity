@@ -4,13 +4,14 @@ import pygtk
 pygtk.require('2.0')
 import gtk
 import os
-from Game2View import Game2View
+from Game3View import Game3View
 from RootView import RootView
 import sys
 from HomeView import HomeView
 from random import randint
+from random import shuffle
 
-class Game2Controller:
+class Game3Controller:
     def __init__(self, view):
         self.view = view
 
@@ -20,45 +21,48 @@ class Game2Controller:
         # Fields of the controller
         self.level = 1
         self.score = 0
-	self.skipsLeft = 3
-        self.incorrectWords = []
-        self.correctWords = [] 
+        self.skipsLeft = 3
+        self.definitions = []
+        self.Words = []
 
-        # Set the game up for the first level
-	self.view.skipLabel.set_text("Skips left:" + str(skipsLeft))
-	self.get_correct("Game2-CorrectlySpelled")
+        self.view.skipLabel.set_text("Skips left:" + str(self.skipsLeft))
+        self.get_correct("Game2-CorrectlySpelled")
         self.generate_level()
 
     def generate_level(self):
-	self.load_level_incorrect(self.level)
-	self.make_round()
+	    self.load_level_definitions()
+	    self.make_round()
 
 
     #INDEXERROR seems to occur sometimes where an incorrect word is saved into the word3
     # no clue why yet
     def make_round(self):
-	roundList = []
-	picked = []
-	#generate a word list for this round and randomly assign them	
-	for i in range(3):
-	    x = randint(0,len(self.correctWords)-1)
-	    if x not in picked:
-	        roundList.append(self.correctWords[x])
-	    picked.append(x)
-	roundList.append(self.incorrectWords[randint(0,len(self.incorrectWords)-1)])
-
+        self.roundList = []
+        self.picked = []
+        self.def_array = []
+	#generate a word list for this round and randomly assign them
+        while len(self.roundList) < 5:
+	        x = randint(0,len(self.Words)-1)
+	        if x not in self.picked:
+	            self.roundList.append(self.Words[x])
+                self.def_array.append(self.definitions[x])
+	        self.picked.append(x)
 	#still need to randomize where the words appear
-	self.view.word1.set_label(roundList[0])
-	self.view.word2.set_label(roundList[1])
-	self.view.word3.set_label(roundList[2])
-	self.view.word4.set_label(roundList[3])
+        shuffle(self.picked)
+        self.view.def1.set_text(self.definitions[self.picked[0]])
+        self.view.word1.set_label(self.roundList[0])
+        self.view.word2.set_label(self.roundList[1])
+        self.view.word3.set_label(self.roundList[2])
+        self.view.word4.set_label(self.roundList[3])
+        self.view.word5.set_label(self.roundList[4])
+
 
 
     def skip_press(self, widget):
 	if self.skipsLeft > 0:
             self.make_round()
 	    self.skipsLeft = self.skipsLeft - 1
-	    self.view.skipLabel.set_text("Skips left:" + str(skipsLeft))
+	    self.view.skipLabel.set_text("Skips left:" + str(self.skipsLeft))
 	else:
 	    self.view.resultLabel.set_text("No Skips Left!")
 
@@ -76,11 +80,11 @@ class Game2Controller:
 
     # This function takes in a file name and load all the words from the corresponding file
     def get_correct(self, filename):
-        self.correctWords = self.load_file(filename)
+        self.Words = self.load_file(filename)
 
     # This function takes in a file name and load all the words from the corresponding file
-    def load_level_incorrect(self, levelNum):
-        self.incorrectWords = self.load_file("Game2-IncorrectlySpelled" + str(levelNum))
+    def load_level_definitions(self):
+        self.definitions = self.load_file("CorrectlySpelled - Definitions")
 
 
 

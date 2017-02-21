@@ -16,6 +16,11 @@ class Game3Controller:
         self.view = view
 
         self.view.skip.connect_object("clicked", self.skip_press, "SKIP")
+        self.view.word1.connect_object("clicked", self.check_correct, "0")
+    	self.view.word2.connect_object("clicked", self.check_correct, "1")
+    	self.view.word3.connect_object("clicked", self.check_correct, "2")
+    	self.view.word4.connect_object("clicked", self.check_correct, "3")
+        self.view.word5.connect_object("clicked", self.check_correct, "4")
         self.view.vbox.connect('expose-event', self.addImage)
 
         # Fields of the controller
@@ -24,9 +29,12 @@ class Game3Controller:
         self.skipsLeft = 3
         self.definitions = []
         self.Words = []
-
+        self.roundList = []
+        self.picked = []
+        self.def_array = []
+        self.isNext = False
         self.view.skipLabel.set_text("Skips left:" + str(self.skipsLeft))
-        self.get_correct("Game2-CorrectlySpelled")
+        self.get_correct("Game2-CorrectLevel1")
         self.generate_level()
 
     def generate_level(self):
@@ -37,6 +45,8 @@ class Game3Controller:
     #INDEXERROR seems to occur sometimes where an incorrect word is saved into the word3
     # no clue why yet
     def make_round(self):
+        self.view.resultLabel.set_text("")
+        self.view.skip.set_label("SKIP")
         self.roundList = []
         self.picked = []
         self.def_array = []
@@ -45,9 +55,8 @@ class Game3Controller:
 	        x = randint(0,len(self.Words)-1)
 	        if x not in self.picked:
 	            self.roundList.append(self.Words[x])
-                self.def_array.append(self.definitions[x])
-	        self.picked.append(x)
-	#still need to randomize where the words appear
+                self.def_array.append(x)
+                self.picked.append(x)
         shuffle(self.picked)
         self.view.def1.set_text(self.definitions[self.picked[0]])
         self.view.word1.set_label(self.roundList[0])
@@ -57,16 +66,36 @@ class Game3Controller:
         self.view.word5.set_label(self.roundList[4])
 
 
-
-    def skip_press(self, widget):
-	if self.skipsLeft > 0:
+    def skip_press(self,widget):
+        if self.isNext:
+            self.skipsLeft += 1
+            self.isNext = False
+        if self.skipsLeft > 0:
             self.make_round()
 	    self.skipsLeft = self.skipsLeft - 1
 	    self.view.skipLabel.set_text("Skips left:" + str(self.skipsLeft))
-	else:
-	    self.view.resultLabel.set_text("No Skips Left!")
+        else:
+            self.view.resultLabel.set_text("No Skips Left!")
 
 
+    def check_correct(self,widget):
+        #need to check to see if the spot in the word file in the same as
+        #in the definition file. If they are on the same line then it matches
+        #If they are not, then the answer is wrong. Once the player gets it correct
+        #remove the definition from the potential list and the word from the list.
+        #print int(widget)
+        #print self.def_array[int(widget)]
+        #print self.definitions.index(self.definitions[self.picked[0]])
+        if self.definitions.index(self.definitions[self.picked[0]]) == self.def_array[int(widget)]:
+            self.view.resultLabel.set_text("CORRECT!")
+            self.updateScore(10)
+            self.view.skip.set_label("NEXT")
+            self.isNext = True
+        else:
+            self.view.resultLabel.set_text("INCORRECT!")
+        #the player answered enough correctly to move on.
+        if len(self.definitions) <= 5:
+            print "Level Over"
 
     # This function takes in a file name and load all the words from the corresponding file
     def load_file(self, filename):

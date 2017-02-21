@@ -35,7 +35,7 @@ class GameController:
         # Set the game up for the first level
         self.next_level()
         self.view.typeBox.createTextBoxes(len(self.level_words[0]))
-
+        self.es = espeak.ESpeak(voice="en+f1", speed = 230)
 
     def addImage(self, widget, event):
         path = 'background.jpg'
@@ -58,7 +58,7 @@ class GameController:
         if self.level_words[self.currentIndex] == typed.upper():
             self.view.resultLabel.set_text("CORRECT!")
             self.view.nextButton.set_label("NEXT")
-            self.updateScore(10)
+            self.update_score(10)
             self.check_current_word = True
         else:
             self.view.resultLabel.set_text("INCORRECT!")
@@ -71,17 +71,28 @@ class GameController:
         speak.stop()
 
     def nextWord(self, widget, data=None):
+        if self.view.nextButton.get_label() == "SKIP":
+            self.skipped.append(self.level_words[self.currentIndex])
+
         self.typed = ""
         self.currentIndex += 1
         print self.currentIndex
         self.check_current_word = False
 
         if self.currentIndex == len(self.level_words):
-            finalText = "LEVEL COMPLETED. You score " + str(self.score) + " out of " + str(len(self.level_words) * 10)
-            os.system("espeak '{}'".format(finalText))
-            self.level += 1
-            self.next_level()
-            # TO-DO: Render the view for the next level
+            if self.score >= 0:
+                # finalText = "LEVEL COMPLETED. You scored " + str(self.score) + " out of " + str(len(self.level_words) * 10)
+                finalText = "LEVEL COMPLETED."
+                os.system("espeak '{}'".format(finalText))
+                self.review_level()
+                self.level += 1
+
+            else:
+                message = "Level incomplete. You skipped too many words. You need at least 70 points to move to the next level"
+                self.es.say(message)
+                # os.system("espeak '{}'".format(message))
+                self.currentIndex = 0
+                self.level_words = self.skipped
 
         else:
             self.playWord(self.view)
@@ -101,9 +112,13 @@ class GameController:
         # a global dictionary that keeps track of all the words used by levels
         self.dictionary[filename] = wordlist
 
-    def updateScore(self, increment):
+    def update_score(self, increment):
         self.score += increment
         self.view.scoreLabel.set_text("SCORE: " + str(self.score))
+
+    def review_level(self):
+        self.view.show_review_screen()
+        self.view.nextButton.connect_object("clicked", self.next_level, "Next Word")
 
     def addImage(self, widget, event):
         path = 'background.jpg'
@@ -135,7 +150,7 @@ class GameController:
             self.view.typeBox.addWord(self.typed)
 
     # Get the words for the next level and reset the view
-    def next_level(self):
+    def next_level(self, widget=None):
         self.load_words("words-level" + str(self.level))
 
         # define words for the level
@@ -145,9 +160,12 @@ class GameController:
 
         # This field keeps track of what the user has typed so far
         self.typed = ""
+        self.view.vbox.add(self.view.typeBox.hbox)
         self.view.typeBox.createTextBoxes(len(self.level_words[0]))
         self.view.label.set_text("LEVEL " + str(self.level))
-
+        self.view.vbox.remove(self.view.hbox)
+        self.view.vbox.add(self.view.hbox)
+        
 def main():
     game = GameController()
     gtk.main()

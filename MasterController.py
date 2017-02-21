@@ -29,7 +29,7 @@ class MasterController:
 
         self.view.window.connect("delete_event", self.delete_event)
         self.view.window.connect("destroy", self.destroy)
-        self.view.vbox.connect('expose-event', self.addImage)
+        #self.view.vbox.connect('expose-event', self.addImage)
 
     # Render the first game
     def render_game1(self, button):

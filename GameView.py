@@ -7,7 +7,9 @@ from TypeBox import TypeBox
 class GameView:
     def __init__(self, window):
         self.window = window
-        # Creates a new button with the label "Hello World".
+        self.set_up_screen()
+
+    def set_up_screen(self):
         self.button = gtk.Button("Play Word")
         self.button.set_can_focus(False)
 
@@ -38,7 +40,6 @@ class GameView:
         self.vbox.add(self.hbox)
         self.hbox.show()
 
-
         # The final step is to display this newly created widget.
         self.button.show()
         self.nextButton.show()
@@ -48,6 +49,19 @@ class GameView:
         self.resultLabel.show()
 
         self.window.show()
+
+    def show_review_screen(self):
+        # Remove all widgets on the screen
+        # self.vbox.remove(self.scoreLabel)
+        self.vbox.remove(self.typeBox.hbox)
+        # self.vbox.remove(self.resultLabel)
+        # self.vbox.remove(self.label)
+        # self.vbox.remove(self.hbox)
+        #
+        self.button.set_label("Retry")
+        self.nextButton.set_label("Next Level")
+        self.label.set_text("Level 1 review")
+
 
     def main(self):
         # All PyGTK applications must have a gtk.main(). Control ends here

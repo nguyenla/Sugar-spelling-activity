@@ -34,13 +34,14 @@ class Game3Controller:
         self.def_array = []
         self.isNext = False
         self.gotPoints = False
+        self.nextLevel = False
         self.view.skipLabel.set_text("Skips left:" + str(self.skipsLeft))
-        self.get_correct("Game2-CorrectLevel1")
         self.generate_level()
 
     def generate_level(self):
-	    self.load_level_definitions()
-	    self.make_round()
+        self.get_correct(self.level)
+	self.load_level_definitions(self.level)
+	self.make_round()
 
 
     #INDEXERROR seems to occur sometimes where an incorrect word is saved into the word3
@@ -58,7 +59,7 @@ class Game3Controller:
 	        if x not in self.picked:
 	            self.roundList.append(self.Words[x])
                     self.def_array.append(x)
-                    self.picked.append(x
+                    self.picked.append(x)
         shuffle(self.picked)
         self.view.def1.set_text(self.definitions[self.picked[0]])
         self.view.word1.set_label(self.roundList[0])
@@ -78,7 +79,20 @@ class Game3Controller:
 	    self.view.skipLabel.set_text("Skips left:" + str(self.skipsLeft))
         else:
             self.view.resultLabel.set_text("No Skips Left!")
-
+        if self.nextLevel:
+            self.skipsLeft += 1
+            self.nextLevel = False
+            self.view.skipLabel.show()
+            self.view.word1.show()
+            self.view.word2.show()
+            self.view.word3.show()
+            self.view.word4.show()
+            self.view.word5.show()
+            self.view.definition.show()
+            self.view.label.show()
+            self.view.scoreLabel.show()
+            self.view.resultLabel.show()
+            self.generate_level()
 
     def check_correct(self,widget):
         #need to check to see if the spot in the word file in the same as
@@ -95,12 +109,31 @@ class Game3Controller:
             self.view.skip.set_label("NEXT")
             self.isNext = True
             self.gotPoints = True
+            del self.definitions[self.picked[0]]
+            del self.Words[self.picked[0]]
         else:
-            #if self.gotPoints == False:
-            self.view.resultLabel.set_text("INCORRECT!")
+            if self.gotPoints == False:
+                self.view.resultLabel.set_text("INCORRECT!")
         #the player answered enough correctly to move on.
-        if len(self.definitions) <= 5:
-            print "Level Over"
+        if len(self.definitions) <= 14:
+            self.level += 1
+            self.view.label.set_text("LEVEL 2")
+            self.endLevel()
+
+    def endLevel(self):
+        self.view.skipLabel.hide()
+        self.view.word1.hide()
+        self.view.word2.hide()
+        self.view.word3.hide()
+        self.view.word4.hide()
+        self.view.word5.hide()
+        self.view.definition.hide()
+        self.view.def1.set_text("Level " +str(self.level-1) + " completed. You have scored " + str(self.score) + " out of " + str((len(self.Words)+5 + (3-self.skipsLeft))*10) + " points.")
+        self.view.label.hide()
+        self.view.scoreLabel.hide()
+        self.view.resultLabel.hide()
+        self.view.skip.set_label("Continue")
+        self.nextLevel = True
 
     # This function takes in a file name and load all the words from the corresponding file
     def load_file(self, filename):
@@ -113,12 +146,12 @@ class Game3Controller:
 	return wordlist
 
     # This function takes in a file name and load all the words from the corresponding file
-    def get_correct(self, filename):
-        self.Words = self.load_file(filename)
+    def get_correct(self, level):
+        self.Words = self.load_file("Game2-CorrectLevel" + str(level))
 
     # This function takes in a file name and load all the words from the corresponding file
-    def load_level_definitions(self):
-        self.definitions = self.load_file("CorrectlySpelled - Definitions")
+    def load_level_definitions(self, level):
+        self.definitions = self.load_file("CorrectlySpelled - Definitions" + str(level))
 
 
 

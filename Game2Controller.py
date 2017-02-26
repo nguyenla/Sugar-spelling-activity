@@ -28,7 +28,7 @@ class Game2Controller:
 	self.skipsLeft = 3
         self.incorrectList = []
         self.correctList = []
-	self.incorrectWord = "" 
+	self.incorrectWord = ""
 	self.roundList = []
 
         # Set the game up for the first level
@@ -48,13 +48,13 @@ class Game2Controller:
         self.incorrectWord = ""
 	picked = []
 
-	#generate a word list for this round and randomly assign them	
+	#generate a word list for this round and randomly assign them
 	while len(picked)<3:
 	    x = randint(0,len(self.correctList)-1)
 	    if x not in picked:
 	        self.roundList.append(self.correctList[x])
 	    	picked.append(x)
-	
+
 	self.incorrectWord = self.incorrectList[randint(0,len(self.incorrectList)-1)]
 	self.roundList.append(self.incorrectWord)
 
@@ -66,7 +66,7 @@ class Game2Controller:
 	self.view.word4.set_label(self.roundList[3])
 
 
-    #Function occurs when the skip button is pressed    
+    #Function occurs when the skip button is pressed
     def skip_press(self, widget):
 	#if there are skips left, load new round & decrement skips
 	if self.skipsLeft > 0:
@@ -91,7 +91,7 @@ class Game2Controller:
 	    else:
 		self.view.resultLabel.set_text("")
 	        self.make_round()
-	else: 
+	else:
 	   self.view.resultLabel.set_text("Wrong! Try again!")
 	   self.make_round()
 

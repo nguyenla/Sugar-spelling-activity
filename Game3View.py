@@ -46,7 +46,7 @@ class Game3View:
         self.vbox.pack_start(self.word2, False, False, 0)
         self.vbox.pack_start(self.word3, False, False, 0)
         self.vbox.pack_start(self.word4, False, False, 0)
-        self.vbox.pack_start(self.word5, True, True, 0)
+        self.vbox.pack_start(self.word5, False, False, 0)
 
         self.vbox.pack_start(self.resultLabel, True, True, 0)
         self.hbox = gtk.HBox(False, 0)

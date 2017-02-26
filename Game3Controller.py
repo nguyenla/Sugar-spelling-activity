@@ -33,6 +33,7 @@ class Game3Controller:
         self.picked = []
         self.def_array = []
         self.isNext = False
+        self.gotPoints = False
         self.view.skipLabel.set_text("Skips left:" + str(self.skipsLeft))
         self.get_correct("Game2-CorrectLevel1")
         self.generate_level()
@@ -47,6 +48,7 @@ class Game3Controller:
     def make_round(self):
         self.view.resultLabel.set_text("")
         self.view.skip.set_label("SKIP")
+        self.gotPoints = False
         self.roundList = []
         self.picked = []
         self.def_array = []
@@ -55,8 +57,8 @@ class Game3Controller:
 	        x = randint(0,len(self.Words)-1)
 	        if x not in self.picked:
 	            self.roundList.append(self.Words[x])
-                self.def_array.append(x)
-                self.picked.append(x)
+                    self.def_array.append(x)
+                    self.picked.append(x
         shuffle(self.picked)
         self.view.def1.set_text(self.definitions[self.picked[0]])
         self.view.word1.set_label(self.roundList[0])
@@ -83,15 +85,18 @@ class Game3Controller:
         #in the definition file. If they are on the same line then it matches
         #If they are not, then the answer is wrong. Once the player gets it correct
         #remove the definition from the potential list and the word from the list.
-        #print int(widget)
+        #print "In def_array"
         #print self.def_array[int(widget)]
+        #print "defintions at picked"
         #print self.definitions.index(self.definitions[self.picked[0]])
         if self.definitions.index(self.definitions[self.picked[0]]) == self.def_array[int(widget)]:
             self.view.resultLabel.set_text("CORRECT!")
             self.updateScore(10)
             self.view.skip.set_label("NEXT")
             self.isNext = True
+            self.gotPoints = True
         else:
+            #if self.gotPoints == False:
             self.view.resultLabel.set_text("INCORRECT!")
         #the player answered enough correctly to move on.
         if len(self.definitions) <= 5:
@@ -122,8 +127,9 @@ class Game3Controller:
 
 
     def updateScore(self, increment):
-        self.score += increment
-        self.view.scoreLabel.set_text("SCORE: " + str(self.score))
+        if self.gotPoints == False:
+            self.score += increment
+            self.view.scoreLabel.set_text("SCORE: " + str(self.score))
 
 
 #General Methods

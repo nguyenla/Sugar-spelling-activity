@@ -14,7 +14,7 @@ from random import shuffle
 class Game3Controller:
     def __init__(self, view):
         self.view = view
-
+        #calls the proper method when the button is clicked
         self.view.skip.connect_object("clicked", self.skip_press, "SKIP")
         self.view.word1.connect_object("clicked", self.check_correct, "0")
     	self.view.word2.connect_object("clicked", self.check_correct, "1")
@@ -54,7 +54,7 @@ class Game3Controller:
         self.roundList = []
         self.picked = []
         self.def_array = []
-	#gets 5 unique words for the round, and the correspoinding definitions
+	#gets 5 unique words for the round, and the correspoinding defintions
         while len(self.roundList) < 5:
 	        x = randint(0,len(self.Words)-1)
 	        if x not in self.picked:
@@ -85,13 +85,14 @@ class Game3Controller:
             self.view.resultLabel.set_text("No Skips Left!")
         if self.nextLevel:
             self.nextLevel = False
+            self.view.label.set_text("LEVEL " + str(self.level))
             self.view.word1.show()
             self.view.word2.show()
             self.view.word3.show()
             self.view.word4.show()
             self.view.word5.show()
             self.view.definition.show()
-            self.view.label.show()
+            self.view.def1.show()
             self.generate_level()
     #if def matches word, updates variables accordingly and deletes the word and def from the array
     #when there are less than 5 words left, end the level
@@ -109,11 +110,11 @@ class Game3Controller:
             if self.gotPoints == False:
                 self.view.resultLabel.set_text("INCORRECT!")
         #the player answered enough correctly to move on.
-        if len(self.definitions) <= 5:
+        if len(self.definitions) <= 14:
             self.level += 1
             self.totalScore +=10
-            self.view.label.set_text("LEVEL 2")
             self.endLevel()
+
     #hides the variables to display the results from the level
     def endLevel(self):
         self.view.word1.hide()
@@ -122,8 +123,9 @@ class Game3Controller:
         self.view.word4.hide()
         self.view.word5.hide()
         self.view.definition.hide()
-        self.view.def1.set_text("Level " +str(self.level-1) + " completed. You have scored " + str(self.score) + " out of " + str(self.totalScore) + " points.")
-        self.view.label.hide()
+        #need the self.level-1 since we already incremented it
+        self.view.label.set_text("Level " +str(self.level-1) + " completed. You have scored " + str(self.score) + " out of " + str(self.totalScore) + " points.")
+        self.view.def1.hide()
         self.view.resultLabel.set_text("")
         self.view.skip.set_label("Continue")
         self.nextLevel = True

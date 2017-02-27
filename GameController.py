@@ -165,7 +165,7 @@ class GameController:
         self.view.label.set_text("LEVEL " + str(self.level))
         self.view.vbox.remove(self.view.hbox)
         self.view.vbox.add(self.view.hbox)
-        
+
 def main():
     game = GameController()
     gtk.main()

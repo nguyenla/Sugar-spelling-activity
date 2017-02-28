@@ -38,11 +38,12 @@ class Game3Controller:
         self.nextLevel = False
         self.view.skipLabel.set_text("Skips left:" + str(self.skipsLeft))
         self.generate_level()
+
     #loads the words and definitions, then sets up the level
     def generate_level(self):
         self.get_correct(self.level)
-	self.load_level_definitions(self.level)
-	self.make_round()
+        self.load_level_definitions(self.level)
+        self.make_round()
 
 
     #resets the resultLabel and skip button to initial value, and resets gotPoints
@@ -54,13 +55,15 @@ class Game3Controller:
         self.roundList = []
         self.picked = []
         self.def_array = []
+
 	#gets 5 unique words for the round, and the correspoinding defintions
         while len(self.roundList) < 5:
-	        x = randint(0,len(self.Words)-1)
-	        if x not in self.picked:
-	            self.roundList.append(self.Words[x])
-                    self.def_array.append(x)
-                    self.picked.append(x)
+            x = randint(0,len(self.Words)-1)
+            if x not in self.picked:
+                self.roundList.append(self.Words[x])
+                self.def_array.append(x)
+                self.picked.append(x)
+
         shuffle(self.picked)
         self.view.def1.set_text(self.definitions[self.picked[0]])
         self.view.word1.set_label(self.roundList[0])
@@ -78,12 +81,13 @@ class Game3Controller:
             self.isNext = False
         if self.skipsLeft > 0:
             self.make_round()
-	    self.skipsLeft = self.skipsLeft - 1
+            self.skipsLeft = self.skipsLeft - 1
             self.totalScore +=10
-	    self.view.skipLabel.set_text("Skips left:" + str(self.skipsLeft))
+            self.view.skipLabel.set_text("Skips left:" + str(self.skipsLeft))
         else:
             self.view.resultLabel.set_text("No Skips Left!")
         if self.nextLevel:
+            #puts the widgets back on the screen for the next level
             self.nextLevel = False
             self.view.label.set_text("LEVEL " + str(self.level))
             self.view.word1.show()
@@ -97,8 +101,8 @@ class Game3Controller:
     #if def matches word, updates variables accordingly and deletes the word and def from the array
     #when there are less than 5 words left, end the level
     def check_correct(self,widget):
-        #checks to see if the button clicked matches the definiction
-        if self.definitions.index(self.definitions[self.picked[0]]) == self.def_array[int(widget)]:
+        #checks if number matches the number at int(widget) index
+        if self.picked[0] == self.def_array[int(widget)]:
             self.view.resultLabel.set_text("CORRECT!")
             self.updateScore(10)
             self.view.skip.set_label("NEXT")
@@ -110,7 +114,7 @@ class Game3Controller:
             if self.gotPoints == False:
                 self.view.resultLabel.set_text("INCORRECT!")
         #the player answered enough correctly to move on.
-        if len(self.definitions) <= 14:
+        if len(self.definitions) <= 5:
             self.level += 1
             self.totalScore +=10
             self.endLevel()
@@ -138,7 +142,7 @@ class Game3Controller:
         while len(word) > 0:
             wordlist.append(word[:len(word)-1])
             word = file.readline()
-	return wordlist
+        return wordlist
 
     # This function takes in a file name and load all the words from the corresponding file
     def get_correct(self, level):

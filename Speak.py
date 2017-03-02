@@ -1,5 +1,6 @@
 # @author: Angel Shiwakoti
 # @createdOn: 02/06/2017
+
 # This class uses threading to spell the word
 # using Espeak Library. It prevents the UI Blocking
 # while Espeak is spelling a word.

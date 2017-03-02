@@ -19,11 +19,12 @@ class GameController:
         self.view = view
         self.view.window.connect("key-press-event", self.readKey)
         self.view.button.connect_object("clicked", self.playWord, "Play Word")
-        self.view.nextButton.connect_object("clicked", self.nextWord, "Next Word")
+        # Experimenting with disconnect
+        self.nextButtonSignal = self.view.nextButton.connect_object("clicked", self.nextWord, "Next Word")
         self.view.vbox.connect('expose-event', self.addImage)
 
         # Fields of the controller
-        self.level = 1
+        self.level = 0
         self.score = 0
         self.dictionary = {} # A dictionary of all the words used in the game
         self.level_words = [] # the list of words to be played
@@ -37,22 +38,6 @@ class GameController:
         self.view.typeBox.createTextBoxes(len(self.level_words[0]))
         self.es = espeak.ESpeak(voice="en+f1", speed = 230)
 
-    def addImage(self, widget, event):
-        path = 'background.jpg'
-        pixbuf = gtk.gdk.pixbuf_new_from_file(path)
-        widget.window.draw_pixbuf(widget.style.bg_gc[gtk.STATE_NORMAL], pixbuf, 0, 0, 0,0)
-
-    def delete_event(self, widget, event, data=None):
-        # If you return FALSE in the "delete_event" signal handler,
-        # GTK will emit the "destroy" signal. Returning TRUE means
-        # you don't want the window to be destroyed.
-        # This is useful for popping up 'are you sure you want to quit?'
-        # type dialogs.
-        print "delete event occurred"
-
-        # Change FALSE to TRUE and the main window will not be destroyed
-        # with a "delete_event".
-        return False
 
     # This function checks if the typed word are correctly spelled
     def checkEntryText(self, typed):
@@ -84,12 +69,11 @@ class GameController:
 
         # reach the end of level
         if self.currentIndex == len(self.level_words):
-            if self.score >= 70: # if the player scores well enough
+            if self.score >= 0: # if the player scores well enough
                 # finalText = "LEVEL COMPLETED. You scored " + str(self.score) + " out of " + str(len(self.level_words) * 10)
                 finalText = "LEVEL COMPLETED."
                 os.system("espeak '{}'".format(finalText))
                 self.review_level()
-                self.level += 1
 
             else: # if the player skips too many words
                 message = "Level incomplete. You skipped too many words. "
@@ -117,22 +101,6 @@ class GameController:
         # a global dictionary that keeps track of all the words used by levels
         self.dictionary[filename] = wordlist
 
-    # This function updates the score of the player by the value specified by the increment parameter
-    def update_score(self, increment):
-        self.score += increment
-        self.view.scoreLabel.set_text("SCORE: " + str(self.score))
-
-    # This function brings up the review screen when a level ends
-    def review_level(self):
-        self.view.show_review_screen()
-        self.view.nextButton.connect_object("clicked", self.next_level, "Next Word")
-
-    # Add the background picture
-    def addImage(self, widget, event):
-        path = 'background.jpg'
-        pixbuf = gtk.gdk.pixbuf_new_from_file(path)
-        widget.window.draw_pixbuf(widget.style.bg_gc[gtk.STATE_NORMAL], pixbuf, 0, 0, 0,0)
-
     # Process the key pressed by the player
     def readKey(self, widget, event):
         keyval = event.keyval
@@ -157,6 +125,8 @@ class GameController:
 
     # Get the words for the next level and reset the view
     def next_level(self, widget = None):
+        self.level += 1
+        print(self.currentIndex)
         self.load_words("words-level" + str(self.level))
 
         # define words for the level
@@ -164,12 +134,36 @@ class GameController:
         self.currentIndex = 0 # reset the current index
         self.check_current_word = False
 
-        self.typed = "" # reset the display
+        self.typed = "" # reset the typed word
         self.view.vbox.add(self.view.typeBox.hbox)
         self.view.typeBox.createTextBoxes(len(self.level_words[0]))
         self.view.label.set_text("LEVEL " + str(self.level))
         self.view.vbox.remove(self.view.hbox)
         self.view.vbox.add(self.view.hbox)
+
+    # This function updates the score of the player by the value specified by the increment parameter
+    def update_score(self, increment):
+        self.score += increment
+        self.view.scoreLabel.set_text("SCORE: " + str(self.score))
+
+    # This function brings up the review screen when a level ends
+    def review_level(self):
+        self.view.show_review_screen()
+        self.view.nextButton.disconnect(self.nextButtonSignal)
+        self.nextButtonSignal = self.view.nextButton.connect_object("clicked", self.next_level, "Next Word")
+
+    # Add the background picture
+    def addImage(self, widget, event):
+        path = 'background.jpg'
+        pixbuf = gtk.gdk.pixbuf_new_from_file(path)
+        widget.window.draw_pixbuf(widget.style.bg_gc[gtk.STATE_NORMAL], pixbuf, 0, 0, 0,0)
+
+
+    def delete_event(self, widget, event, data=None):
+        print "delete event occurred"
+        # Change FALSE to TRUE and the main window will not be destroyed
+        # with a "delete_event".
+        return False
 
     def destroy(self, widget, data=None):
         print "destroy signal occurred"

@@ -34,7 +34,9 @@ class Game2Controller:
 	self.roundList = []
 
         # Set the game up for the first level
+<<<<<<< HEAD
         self.generate_level("")
+>>>>>>> 39cd560dc397a5be0bc2e5e1fb21db8f5e11bebc
 
     #Generate level by loading the level's incorrect words & make a round
     def generate_level(self, widget):
@@ -150,7 +152,9 @@ class Game2Controller:
         self.correctList = self.load_file("Game2-CorrectLevel" + str(self.level))
 
     # This function takes in a file name and load all the words from the corresponding file
+<<<<<<< HEAD
     def load_level_incorrect(self):
+>>>>>>> 39cd560dc397a5be0bc2e5e1fb21db8f5e11bebc
         self.incorrectList = self.load_file("Game2-IncorrectLevel" + str(self.level))
 
 

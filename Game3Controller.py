@@ -24,6 +24,7 @@ class Game3Controller:
         self.view.vbox.connect('expose-event', self.addImage)
 
         # Fields of the controller
+        self.numGuesses = 1
         self.level = 1
         self.score = 0
         self.skipsLeft = 3
@@ -51,6 +52,7 @@ class Game3Controller:
     def make_round(self):
         self.view.resultLabel.set_text("")
         self.view.skip.set_label("SKIP")
+        self.numGuesses = 1
         self.gotPoints = False
         self.roundList = []
         self.picked = []
@@ -102,6 +104,11 @@ class Game3Controller:
     #when there are less than 5 words left, end the level
     def check_correct(self,widget):
         #checks if number matches the number at int(widget) index
+        if self.numGuesses == 0:
+            self.endLevel()
+            self.view.label.set_text("Incorrect. Too many guesses")
+            self.skipsLeft += 1
+            #self.nextLevel = False
         if self.picked[0] == self.def_array[int(widget)] and self.isNext==False:
             self.view.resultLabel.set_text("CORRECT!")
             self.updateScore(10)
@@ -112,7 +119,9 @@ class Game3Controller:
             del self.Words[self.picked[0]]
         else:
             if self.gotPoints == False:
-                self.view.resultLabel.set_text("INCORRECT!")
+                if self.numGuesses > 0:
+                    self.view.resultLabel.set_text("INCORRECT! " + str(self.numGuesses) + " left.")
+                self.numGuesses -= 1
         #the player answered enough correctly to move on.
         if len(self.definitions) <= 5:
             self.level += 1
@@ -151,11 +160,6 @@ class Game3Controller:
     # This function takes in a file name and load all the words from the corresponding file
     def load_level_definitions(self, level):
         self.definitions = self.load_file("CorrectlySpelled - Definitions" + str(level))
-
-
-
-
-
 
     #increates the score when points have no already been awarded
     def updateScore(self, increment):

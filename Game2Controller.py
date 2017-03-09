@@ -33,7 +33,7 @@ class Game2Controller:
 
         # Set the game up for the first level
 	self.view.skipLabel.set_text("Skips left:" + str(self.skipsLeft))
-	self.get_correct("Game2-CorrectlySpelled")
+	self.get_correct("Game2-CorrectLevel" + str(self.level))
         self.generate_level()
 
     #Generate level by loading the level's incorrect words & make a round
@@ -130,7 +130,7 @@ class Game2Controller:
 
     # This function takes in a file name and load all the words from the corresponding file
     def load_level_incorrect(self, levelNum):
-        self.incorrectList = self.load_file("Game2-IncorrectlySpelled" + str(levelNum))
+        self.incorrectList = self.load_file("Game2-IncorrectLevel" + str(self.level))
 
 
 #General Methods

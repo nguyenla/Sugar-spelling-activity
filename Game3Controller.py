@@ -102,7 +102,7 @@ class Game3Controller:
     #when there are less than 5 words left, end the level
     def check_correct(self,widget):
         #checks if number matches the number at int(widget) index
-        if self.picked[0] == self.def_array[int(widget)]:
+        if self.picked[0] == self.def_array[int(widget)] and self.isNext==False:
             self.view.resultLabel.set_text("CORRECT!")
             self.updateScore(10)
             self.view.skip.set_label("NEXT")
@@ -159,9 +159,8 @@ class Game3Controller:
 
     #increates the score when points have no already been awarded
     def updateScore(self, increment):
-        if self.gotPoints == False:
-            self.score += increment
-            self.view.scoreLabel.set_text("SCORE: " + str(self.score))
+        self.score += increment
+        self.view.scoreLabel.set_text("SCORE: " + str(self.score))
 
 
 #General Methods

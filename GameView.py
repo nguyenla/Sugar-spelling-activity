@@ -12,13 +12,13 @@ class GameView:
     # This function displays the screen at the beginning of each level
     def set_up_screen(self):
         # The "PLAY" button
-        self.button = gtk.Button("Play Word")
-        self.button.set_can_focus(False)
-        self.button.set_size_request(20,30)
+        self.left_button = gtk.Button("Play Word")
+        self.left_button.set_can_focus(False)
+        self.left_button.set_size_request(20,30)
 
         # The "NEXT" button
-        self.nextButton = gtk.Button("SKIP")
-        self.nextButton.set_can_focus(False)
+        self.right_button = gtk.Button("SKIP")
+        self.right_button.set_can_focus(False)
 
         # The boxes for the letters
         self.typeBox = TypeBox()
@@ -40,15 +40,15 @@ class GameView:
 
         # A HBox to keep the two buttons "PLAY" and "NEXT"
         self.hbox = gtk.HBox(False, 0)
-        self.hbox.pack_start(self.button, True, True, 0)
-        self.hbox.pack_start(self.nextButton, True, True, 0)
+        self.hbox.pack_start(self.left_button, True, True, 0)
+        self.hbox.pack_start(self.right_button, True, True, 0)
 
         self.vbox.add(self.hbox)
         self.hbox.show()
 
         # The final step is to display this newly created widget.
-        self.button.show()
-        self.nextButton.show()
+        self.left_button.show()
+        self.right_button.show()
         self.typeBox.show()
         self.label.show()
         self.scoreLabel.show()
@@ -56,7 +56,7 @@ class GameView:
 
         self.window.show()
 
-    def show_review_screen(self):
+    def show_review_screen(self, review_text):
         # Remove all widgets on the screen
         self.typeBox.createTextBoxes(0)
         # self.vbox.remove(self.typeBox.hbox)
@@ -64,9 +64,12 @@ class GameView:
         # self.vbox.remove(self.label)
         # self.vbox.remove(self.hbox)
 
-        self.button.set_label("Retry")
-        self.nextButton.set_label("Next Level")
-        self.label.set_text("Level 1 review")
+        self.left_button.set_label("Retry")
+        self.right_button.set_label("Next Level")
+        self.label.set_text(review_text)
+
+    def show_final_screen(self):
+        self.label.set_text("You have completed the game.")
 
 
     def main(self):

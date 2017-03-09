@@ -24,11 +24,14 @@ class Game2View:
         self.skip = gtk.Button("SKIP")
         self.skip.set_can_focus(False)
 
+	self.next = gtk.Button("NEXT LEVEL")
+        self.skip.set_can_focus(False)
+
 	#Generate the necessary labels
-        self.label = gtk.Label("LEVEL 1")
+        self.levelLabel = gtk.Label("LEVEL 1")
         self.scoreLabel = gtk.Label("SCORE: 0")
         self.resultLabel = gtk.Label("")
-	self.skipLabel = gtk.Label("Skips left: 0")
+	self.skipLabel = gtk.Label("SKIPS LEFT: 0")
 
 
         #self.button.set_size_request(20,30)
@@ -38,17 +41,19 @@ class Game2View:
         self.vbox.show()
 
 	#Pack the first box with everything
-        self.vbox.pack_start(self.label, True, True, 0)
+        self.vbox.pack_start(self.levelLabel, True, True, 0)
         self.vbox.pack_start(self.word1, True, True, 0)
         self.vbox.pack_start(self.word2, True, True, 0)
         self.vbox.pack_start(self.word3, True, True, 0)
         self.vbox.pack_start(self.word4, True, True, 0)
         self.vbox.pack_start(self.resultLabel, True, True, 0)
 
+
         self.hbox = gtk.HBox(False, 0)
 
 	self.hbox.pack_start(self.scoreLabel, True, True, 0)
         self.hbox.pack_start(self.skip, True, True, 0)
+        self.hbox.pack_start(self.next, True, True, 0)
         self.hbox.pack_start(self.skipLabel, True, True, 0)
 	
 
@@ -62,7 +67,7 @@ class Game2View:
         self.word2.show()
         self.word3.show()
         self.word4.show()
-        self.label.show()
+        self.levelLabel.show()
         self.scoreLabel.show()
         self.resultLabel.show()
 	self.skipLabel.show()

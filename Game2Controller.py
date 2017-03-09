@@ -10,12 +10,14 @@ import sys
 from HomeView import HomeView
 from random import randint
 from random import shuffle
+import time
 
 class Game2Controller:
     def __init__(self, view):
         self.view = view
 
         self.view.skip.connect_object("clicked", self.skip_press, "SKIP")
+        self.view.next.connect_object("clicked", self.generate_level, "NEXT LEVEL")
 	self.view.word1.connect_object("clicked", self.check, "0")
 	self.view.word2.connect_object("clicked", self.check, "1")
 	self.view.word3.connect_object("clicked", self.check, "2")
@@ -23,22 +25,25 @@ class Game2Controller:
         self.view.vbox.connect('expose-event', self.addImage)
 
         # Fields of the controller
-        self.level = 1
+        self.level = 0
         self.score = 0
-	self.skipsLeft = 3
+	self.skipsLeft = 0
         self.incorrectList = []
         self.correctList = []
 	self.incorrectWord = ""
 	self.roundList = []
 
         # Set the game up for the first level
-	self.view.skipLabel.set_text("Skips left:" + str(self.skipsLeft))
-	self.get_correct("Game2-CorrectlySpelled")
-        self.generate_level()
+        self.generate_level("")
 
     #Generate level by loading the level's incorrect words & make a round
-    def generate_level(self):
-	self.load_level_incorrect(self.level)
+    def generate_level(self, widget):
+	self.reveal_screen()
+	self.skipsLeft = 3
+	self.view.skipLabel.set_text("Skips left:" + str(self.skipsLeft))
+	self.level = self.level + 1
+	self.load_level_correct()
+	self.load_level_incorrect()
 	self.make_round()
 
 
@@ -55,16 +60,41 @@ class Game2Controller:
 	        self.roundList.append(self.correctList[x])
 	    	picked.append(x)
 
+	#Randomly pick the round's incorrect word
 	self.incorrectWord = self.incorrectList[randint(0,len(self.incorrectList)-1)]
 	self.roundList.append(self.incorrectWord)
 
-	#still need to randomize where the words appear
+	#Randomizes where the words appear
 	shuffle(self.roundList)
 	self.view.word1.set_label(self.roundList[0])
 	self.view.word2.set_label(self.roundList[1])
 	self.view.word3.set_label(self.roundList[2])
 	self.view.word4.set_label(self.roundList[3])
 
+
+    #Function checks the button pressed to see if the player is correct
+    def check(self, widget):
+	target = self.roundList[int(widget)]
+	#if the user selected word is the incorrect word, take it out, update score, make new round
+	if target in self.incorrectList:
+	    self.updateScore(10)
+	    del self.incorrectList[self.incorrectList.index(target)]
+
+	    if len(self.incorrectList) == 0:
+	        print "LEVEL OVER"
+		self.level_over()
+	    else:
+		self.view.resultLabel.set_text("")
+	        self.make_round()
+	#else, keep the incorrect word in the level and make new round
+	else:
+	   self.view.resultLabel.set_text("Wrong! Try again!")
+	   self.make_round()
+
+    #Function updates score
+    def updateScore(self, increment):
+        self.score += increment
+        self.view.scoreLabel.set_text("SCORE: " + str(self.score))
 
     #Function occurs when the skip button is pressed
     def skip_press(self, widget):
@@ -78,28 +108,6 @@ class Game2Controller:
 	if self.skipsLeft == 0:
 	    self.view.skip.set_sensitive(False)
 
-    #Function checks the button pressed to see if the player is correct
-    def check(self, widget):
-	target = self.roundList[int(widget)]
-	if target in self.incorrectList:
-	    self.updateScore(10)
-	    del self.incorrectList[self.incorrectList.index(target)]
-
-	    if len(self.incorrectList) == 0:
-	        print "LEVEL OVER"
-		self.level_over()
-	    else:
-		self.view.resultLabel.set_text("")
-	        self.make_round()
-	else:
-	   self.view.resultLabel.set_text("Wrong! Try again!")
-	   self.make_round()
-
-    #Function updates score
-    def updateScore(self, increment):
-        self.score += increment
-        self.view.scoreLabel.set_text("SCORE: " + str(self.score))
-
     #temporary level over function
     def level_over(self):
 	self.view.skip.hide()
@@ -107,11 +115,24 @@ class Game2Controller:
         self.view.word2.hide()
         self.view.word3.hide()
         self.view.word4.hide()
-        self.view.label.hide()
         self.view.scoreLabel.hide()
-        self.view.resultLabel.hide()
 	self.view.skipLabel.hide()
 
+	self.view.levelLabel.set_text("LEVEL " + str(self.level+1))
+        self.view.resultLabel.set_text("Ready for the next level?")
+	self.view.next.show()
+
+    def reveal_screen(self):
+	self.view.skip.show()
+	self.view.word1.show()
+        self.view.word2.show()
+        self.view.word3.show()
+        self.view.word4.show()
+        self.view.scoreLabel.show()
+	self.view.skipLabel.show()
+
+        self.view.resultLabel.set_text("")
+	self.view.next.hide()
 
 #Text File Methods
     # This function takes in a file name and load all the words from the corresponding file
@@ -125,12 +146,12 @@ class Game2Controller:
 	return wordlist
 
     # This function takes in a file name and load all the words from the corresponding file
-    def get_correct(self, filename):
-        self.correctList = self.load_file(filename)
+    def load_level_correct(self):
+        self.correctList = self.load_file("Game2-CorrectLevel" + str(self.level))
 
     # This function takes in a file name and load all the words from the corresponding file
-    def load_level_incorrect(self, levelNum):
-        self.incorrectList = self.load_file("Game2-IncorrectlySpelled" + str(levelNum))
+    def load_level_incorrect(self):
+        self.incorrectList = self.load_file("Game2-IncorrectLevel" + str(self.level))
 
 
 #General Methods

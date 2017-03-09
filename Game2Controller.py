@@ -32,6 +32,7 @@ class Game2Controller:
         self.correctList = []
 	self.incorrectWord = ""
 	self.roundList = []
+	self.gameOver = False
 
         # Set the game up for the first level
         self.generate_level("")
@@ -44,8 +45,11 @@ class Game2Controller:
 	self.level = self.level + 1
 	self.load_level_correct()
 	self.load_level_incorrect()
-	self.make_round()
-
+	if(self.gameOver == True):
+	    self.end_game()
+	else:
+	    self.make_round()
+	
 
     #Function populates the 4 buttons for the round (3 correct, 1 incorrect)
     def make_round(self):
@@ -134,6 +138,18 @@ class Game2Controller:
         self.view.resultLabel.set_text("")
 	self.view.next.hide()
 
+    def end_game(self):
+	self.view.skip.hide()
+        self.view.word1.hide()
+        self.view.word2.hide()
+        self.view.word3.hide()
+        self.view.word4.hide()
+        self.view.scoreLabel.hide()
+	self.view.skipLabel.hide()
+
+	self.view.levelLabel.set_text("CONGRATULATIONS!")
+        self.view.resultLabel.set_text("You've reached the end of the game!")
+
 #Text File Methods
     # This function takes in a file name and load all the words from the corresponding file
     def load_file(self, filename):
@@ -147,12 +163,17 @@ class Game2Controller:
 
     # This function takes in a file name and load all the words from the corresponding file
     def load_level_correct(self):
-        self.correctList = self.load_file("Game2-CorrectLevel" + str(self.level))
+	try:
+            self.correctList = self.load_file("Game2-CorrectLevel" + str(self.level))
+	except IOError:
+	    self.gameOver = True
 
     # This function takes in a file name and load all the words from the corresponding file
     def load_level_incorrect(self):
-        self.incorrectList = self.load_file("Game2-IncorrectLevel" + str(self.level))
-
+	try:
+            self.incorrectList = self.load_file("Game2-IncorrectLevel" + str(self.level))
+	except IOError:
+	    self.gameOver = True
 
 #General Methods
     def addImage(self, widget, event):

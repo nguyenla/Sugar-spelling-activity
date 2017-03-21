@@ -56,7 +56,7 @@ class GameView:
 
         self.window.show()
 
-    def show_review_screen(self):
+    def show_review_screen(self, review_text):
         # Remove all widgets on the screen
         self.typeBox.createTextBoxes(0)
         # self.vbox.remove(self.typeBox.hbox)
@@ -66,7 +66,10 @@ class GameView:
 
         self.left_button.set_label("Retry")
         self.right_button.set_label("Next Level")
-        self.label.set_text("Level review")
+        self.label.set_text(review_text)
+
+    def show_final_screen(self):
+        self.label.set_text("You have completed the game.")
 
 
     def main(self):

@@ -14,6 +14,8 @@ class GameController:
     def __init__(self, view):
         # Engine to produce sound for any word
         # self.es = espeak.ESpeak()
+
+        self.NUMBER_OF_LEVELS = 2
         self.view = view
         self.view.window.connect("key-press-event", self.readKey)
         self.view.vbox.connect('expose-event', self.addImage)
@@ -32,22 +34,30 @@ class GameController:
         self.check_current_word = False # keep track of whether the current word has been checked
         self.typed = "" # keeps track of what the user has typed so far
         self.skipped = [] # list of words that are skipped
+        self.misspelled = {} # dictionary of misspelled words and the number of times the user misspelled each word
 
         # Set the game up for the first level
         self.next_level()
         self.view.typeBox.createTextBoxes(len(self.level_words[0]))
-        self.es = espeak.ESpeak(voice="en+f1", speed = 230)
+        self.es = espeak.ESpeak(voice="en+f1", speed = 200)
 
 
     # This function checks if the typed word are correctly spelled
-    def checkEntryText(self, typed):
-        if self.level_words[self.currentIndex] == typed.upper():
+    def check_spelling(self, typed):
+        cur_word = self.level_words[self.currentIndex]
+        if typed.upper() == cur_word:
             self.view.resultLabel.set_text("CORRECT!")
             self.view.right_button.set_label("NEXT")
             self.update_score(10)
             self.check_current_word = True
         else:
             self.view.resultLabel.set_text("INCORRECT!")
+            if cur_word not in self.misspelled:
+                self.misspelled[cur_word] = 1
+            else:
+                self.misspelled[cur_word] += 1
+            print(cur_word + ": ")
+            print(self.misspelled[cur_word])
 
 
     # This function plays the audio for the current word
@@ -59,7 +69,7 @@ class GameController:
 
     # This function gets the next word to be played and display it on the screen
     def next_word(self, widget, data=None):
-        print("Getting next word")
+        print("Next word")
         # If the user skips a word, add the skipped word to the skipped list
         if self.view.right_button.get_label() == "SKIP":
             self.skipped.append(self.level_words[self.currentIndex])
@@ -115,7 +125,7 @@ class GameController:
         # Enter function
         elif keyval_name == 'Return':
             if self.check_current_word == False: # if the word hasn't been validated yet
-                self.checkEntryText(self.typed)
+                self.check_spelling(self.typed)
             else:
                 self.next_word(self.view.right_button) # move on to the next word
 
@@ -126,32 +136,35 @@ class GameController:
 
     # Get the words for the next level and reset the view
     def next_level(self, widget = None):
-        print("Fetching next level")
         self.level += 1
-        print(self.currentIndex)
-        self.load_words("words-level" + str(self.level))
+        if self.level > self.NUMBER_OF_LEVELS:
+            print("Game over")
+            self.view.show_final_screen()
+        else:
+            print(self.currentIndex)
+            self.load_words("words-level" + str(self.level))
 
-        # define words for the level
-        self.level_words = self.dictionary["words-level" + str(self.level)]
-        self.currentIndex = 0 # reset the current index
-        self.check_current_word = False
+            # define words for the level
+            self.level_words = self.dictionary["words-level" + str(self.level)]
+            self.currentIndex = 0 # reset the current index
+            self.check_current_word = False
 
-        # TODO: Refactor this block later
-        self.typed = "" # reset the typed word
-        self.view.vbox.add(self.view.typeBox.hbox)
-        self.view.typeBox.createTextBoxes(len(self.level_words[0]))
-        self.view.label.set_text("LEVEL " + str(self.level))
-        self.view.vbox.remove(self.view.hbox)
-        self.view.vbox.add(self.view.hbox)
+            # TODO: Refactor this block later
+            self.typed = "" # reset the typed word
+            self.view.vbox.add(self.view.typeBox.hbox)
+            self.view.typeBox.createTextBoxes(len(self.level_words[0]))
+            self.view.label.set_text("LEVEL " + str(self.level))
+            self.view.vbox.remove(self.view.hbox)
+            self.view.vbox.add(self.view.hbox)
 
-        # Set up the buttons for the next level
-        self.view.left_button.disconnect(self.left_button_signal)
-        self.left_button_signal = self.view.left_button.connect("clicked", self.play_word)
-        self.view.left_button.set_label("PLAY WORD")
+            # Set up the buttons for the next level
+            self.view.left_button.disconnect(self.left_button_signal)
+            self.left_button_signal = self.view.left_button.connect("clicked", self.play_word)
+            self.view.left_button.set_label("PLAY WORD")
 
-        self.view.right_button.disconnect(self.right_button_signal)
-        self.right_button_signal = self.view.right_button.connect("clicked", self.next_word)
-        self.view.right_button.set_label("SKIP")
+            self.view.right_button.disconnect(self.right_button_signal)
+            self.right_button_signal = self.view.right_button.connect("clicked", self.next_word)
+            self.view.right_button.set_label("SKIP")
 
 
     # This function updates the score of the player by the value specified by the increment parameter
@@ -161,7 +174,9 @@ class GameController:
 
     # This function brings up the review screen when a level ends
     def review_level(self):
-        self.view.show_review_screen()
+        text = "Level Summary \n You have skipped " + str(len(self.skipped)) + " words"
+
+        self.view.show_review_screen(text)
 
         # Connect the buttons to their functions on the review screen
         self.view.left_button.disconnect(self.left_button_signal)

@@ -38,6 +38,7 @@ class Game2Controller:
         self.generate_level("")
 
     #Generate level by loading the level's incorrect words & make a round
+    #If there are no levels left, the game will end
     def generate_level(self, widget):
 	self.reveal_screen()
 	self.skipsLeft = 3
@@ -112,7 +113,7 @@ class Game2Controller:
 	if self.skipsLeft == 0:
 	    self.view.skip.set_sensitive(False)
 
-    #temporary level over function
+    #Function hides everything on screen and prompts user to advance to next level
     def level_over(self):
 	self.view.skip.hide()
         self.view.word1.hide()
@@ -126,6 +127,7 @@ class Game2Controller:
         self.view.resultLabel.set_text("Ready for the next level?")
 	self.view.next.show()
 
+    #Function shows everything needed for new level
     def reveal_screen(self):
 	self.view.skip.show()
 	self.view.word1.show()
@@ -138,6 +140,7 @@ class Game2Controller:
         self.view.resultLabel.set_text("")
 	self.view.next.hide()
 
+    #Function hides everything and alerts the user that the game is over	
     def end_game(self):
 	self.view.skip.hide()
         self.view.word1.hide()
@@ -162,6 +165,7 @@ class Game2Controller:
 	return wordlist
 
     # This function takes in a file name and load all the words from the corresponding file
+    # Error catch is for the end of game
     def load_level_correct(self):
 	try:
             self.correctList = self.load_file("Game2-CorrectLevel" + str(self.level))
@@ -169,6 +173,7 @@ class Game2Controller:
 	    self.gameOver = True
 
     # This function takes in a file name and load all the words from the corresponding file
+    # Error catch is for the end of game
     def load_level_incorrect(self):
 	try:
             self.incorrectList = self.load_file("Game2-IncorrectLevel" + str(self.level))

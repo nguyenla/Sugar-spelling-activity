@@ -94,11 +94,14 @@ class Game2Controller:
 	#else, keep the incorrect word in the level and make new round
 	else:
 	   self.view.resultLabel.set_text("Wrong! Try again!")
+	   self.updateScore(-2)
 	   self.make_round()
 
     #Function updates score
     def updateScore(self, increment):
         self.score += increment
+	if self.score < 0:
+	    self.score = 0
         self.view.scoreLabel.set_text("SCORE: " + str(self.score))
 
     #Function occurs when the skip button is pressed
